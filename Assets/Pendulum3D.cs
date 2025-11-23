@@ -7,66 +7,81 @@ public class Pendulum3D : MonoBehaviour
     public float damping = 0.995f;
 
     [Header("References")]
-    public Transform stringCylinder;  // 👈 assign your Cylinder here in Inspector
+    public Transform stringCylinder;   // Assign Cylinder here
+    public Transform bob;              // Assign Sphere here
 
     private float angle;
-    private float angularVelocity = 0f;
-    private float angularAcceleration = 0f;
-
-    private Transform pivot;
-    private bool isRunning = false;
+    private float angularVelocity;
+    private float angularAcceleration;
 
     private float configuredAngle;
     private float configuredLength;
 
+    private Transform pivot;
+    private bool isRunning = false;
+
     void Start()
     {
-        pivot = transform.parent;
-        Configure(0f, 2f); // default
+        pivot = transform.parent;   // This object (Pendulum) is child of Pivot
+        Configure(20f, 2f);         // Default: 20° angle, 2m length
     }
 
     void FixedUpdate()
     {
         if (!isRunning) return;
 
+        // Physics for angular motion
         angularAcceleration = (-gravity / configuredLength) * Mathf.Sin(angle);
         angularVelocity += angularAcceleration * Time.deltaTime;
-        angularVelocity *= damping;
+        angularVelocity *= damping;             // slow down over time
         angle += angularVelocity * Time.deltaTime;
 
-        UpdateBobPosition();
+        UpdatePendulum();
     }
 
-    void UpdateBobPosition()
+    void UpdatePendulum()
     {
-        // Bob local position relative to pivot
-        transform.localPosition = new Vector3(configuredLength * Mathf.Sin(angle), -configuredLength * Mathf.Cos(angle), 0f);
+        // 🔥 Rotate the WHOLE pendulum (string + bob)
+        transform.localRotation = Quaternion.Euler(0, 0, angle * Mathf.Rad2Deg);
 
-        // Update cylinder scale + position
+        // ---------------- BOB POSITION ----------------
+        if (bob != null)
+        {
+            // Bob always sits at (-length)
+            bob.localPosition = new Vector3(0f, -configuredLength, 0f);
+        }
+
+        // ---------------- STRING (CYLINDER) ----------------
         if (stringCylinder != null)
         {
+            // Cylinder height = half of total length
             stringCylinder.localScale = new Vector3(
                 stringCylinder.localScale.x,
-                configuredLength / 2f,   // Y-scale = half the length (because Unity’s primitive cylinders are 2 units tall by default)
+                configuredLength / 2f,
                 stringCylinder.localScale.z
             );
 
-            stringCylinder.localPosition = new Vector3(0f, -configuredLength / 2f, 0f);
+            // Move cylinder so its TOP stays at pivot
+            stringCylinder.localPosition = new Vector3(
+                0f,
+                -configuredLength / 2f,
+                0f
+            );
         }
     }
 
     // ---------------- PUBLIC API ----------------
 
-    public void Configure(float angleDeg, float len)
+    public void Configure(float angleDeg, float length)
     {
         configuredAngle = angleDeg;
-        configuredLength = Mathf.Max(0.1f, len);
+        configuredLength = Mathf.Max(0.1f, length);  // avoid zero length
 
         angle = configuredAngle * Mathf.Deg2Rad;
         angularVelocity = 0f;
         angularAcceleration = 0f;
 
-        UpdateBobPosition();
+        UpdatePendulum();  // refresh UI before playing
     }
 
     public void Play()
@@ -78,7 +93,6 @@ public class Pendulum3D : MonoBehaviour
     {
         isRunning = false;
         angularVelocity = 0f;
-        angularAcceleration = 0f;
 
         Configure(configuredAngle, configuredLength);
     }
