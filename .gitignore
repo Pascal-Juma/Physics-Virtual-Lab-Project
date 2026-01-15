@@ -1,5 +1,5 @@
 ﻿# ======================
-# UNITY
+# UNITY GENERATED
 # ======================
 [Ll]ibrary/
 [Tt]emp/
@@ -24,31 +24,17 @@
 *.booproj
 
 # ======================
-# UNITY GENERATED
-# ======================
-*.unitypackage
-*.apk
-*.aab
-*.exe
-*.app
-*.log
-
-# ======================
-# FIREBASE (SDK ONLY – JSON KEPT)
+# FIREBASE SDK (LOCAL ONLY)
 # ======================
 Assets/Firebase/
 Assets/Google/
 Assets/Plugins/Firebase/
 
 # ======================
-# OS FILES
+# OS / ARCHIVES
 # ======================
 .DS_Store
 Thumbs.db
-
-# ======================
-# LARGE ARCHIVES
-# ======================
 *.zip
 *.rar
 *.7z
