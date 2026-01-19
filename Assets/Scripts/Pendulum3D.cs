@@ -29,7 +29,7 @@ public class Pendulum3D : MonoBehaviour
     void Start()
     {
         pivot = transform.parent;      // Pendulum object is a child of the pivot
-        Configure(20f, 2f);            // Default values
+        Configure(20f, 2.5f);            // Default values
         lastAngle = angle;
     }
 
@@ -113,18 +113,25 @@ public class Pendulum3D : MonoBehaviour
         lastAngle = angle;
     }
 
+    /// <summary>
+    /// Starts or resumes the pendulum motion
+    /// </summary>
     public void Play()
     {
         isRunning = true;
         isRunningUI = true;
+        Debug.Log("▶️ Pendulum PLAY - Motion started");
     }
 
+    /// <summary>
+    /// Pauses the pendulum motion (keeps timer and oscillation count)
+    /// </summary>
     public void Stop()
     {
         isRunning = false;
         isRunningUI = false;
-        angularVelocity = 0f;
-        // Optional: keep current angle to display timer/oscillations
+        angularVelocity = 0f; // Stop velocity so it doesn't continue moving
+        Debug.Log("⏸️ Pendulum STOP - Motion paused (Timer: " + timer.ToString("F2") + "s, Oscillations: " + oscillationCount + ")");
     }
 
     public void Reset()
